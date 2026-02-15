@@ -4,7 +4,9 @@ import InternForm from './components/InternForm';
 import InternTable from './components/InternTable';
 import SearchFilter from './components/SearchFilter';
 
-const API_BASE_URL = '/api/interns';
+const API_BASE_URL = import.meta.env.VITE_API_URL 
+  ? `${import.meta.env.VITE_API_URL}/api/interns`
+  : '/api/interns';
 
 function App() {
   const [interns, setInterns] = useState([]);
