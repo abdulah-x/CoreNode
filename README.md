@@ -2,7 +2,16 @@
 
 A full-stack application for managing internship applications built with React, Node.js/Express, and MongoDB.
 
-## 📋 Features
+## � Repository
+
+**GitHub:** [https://github.com/abdulah-x/CoreNode](https://github.com/abdulah-x/CoreNode)
+
+```bash
+git clone https://github.com/abdulah-x/CoreNode.git
+cd CoreNode
+```
+
+## �📋 Features
 
 ### Backend
 
