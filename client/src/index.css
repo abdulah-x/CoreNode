@@ -21,3 +21,15 @@ body {
   margin: 0 auto;
   padding: 2rem;
 }
+
+@media (max-width: 768px) {
+  #root {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  #root {
+    padding: 0.75rem;
+  }
+}
