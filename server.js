@@ -12,6 +12,47 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/intern-tracker';
 
+// Configure Mongoose for serverless
+mongoose.set('strictQuery', false);
+mongoose.set('bufferCommands', false);
+
+// Connect to MongoDB
+let isConnected = false;
+
+const connectDB = async () => {
+  if (isConnected && mongoose.connection.readyState === 1) {
+    return;
+  }
+  
+  try {
+    const conn = await mongoose.connect(MONGODB_URI, {
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+    });
+    isConnected = true;
+    console.log('✅ Connected to MongoDB Atlas');
+    return conn;
+  } catch (error) {
+    console.error('❌ MongoDB connection error:', error);
+    isConnected = false;
+    throw error;
+  }
+};
+
+// Middleware to ensure DB connection
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (error) {
+    console.error('DB connection failed:', error);
+    res.status(503).json({
+      error: 'Database connection failed',
+      message: 'Unable to connect to the database. Please check your MongoDB connection string.'
+    });
+  }
+});
+
 // Middleware
 const allowedOrigins = [
   'http://localhost:3000',
@@ -45,7 +86,12 @@ app.use('/api/interns', internRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', message: 'Server is running' });
+  const dbStatus = mongoose.connection.readyState === 1 ? 'connected' : 'disconnected';
+  res.json({ 
+    status: 'ok', 
+    message: 'Server is running',
+    database: dbStatus
+  });
 });
 
 // 404 handler
@@ -60,27 +106,6 @@ app.use((req, res) => {
 
 // Centralized error handling middleware (must be last)
 app.use(errorHandler);
-
-// Connect to MongoDB
-let isConnected = false;
-
-const connectDB = async () => {
-  if (isConnected) {
-    return;
-  }
-  
-  try {
-    await mongoose.connect(MONGODB_URI);
-    isConnected = true;
-    console.log('✅ Connected to MongoDB');
-  } catch (error) {
-    console.error('❌ MongoDB connection error:', error);
-    throw error;
-  }
-};
-
-// Connect to MongoDB on startup
-connectDB().catch(console.error);
 
 // Start server only in non-Vercel environment
 if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
