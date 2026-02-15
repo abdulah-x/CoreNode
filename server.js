@@ -16,8 +16,8 @@ const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/intern
 const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:5173', // Vite default
+  'https://corenode-frontend.vercel.app', // Production frontend
   process.env.FRONTEND_URL,
-  // Add your Vercel frontend URL after deployment
 ].filter(Boolean);
 
 app.use(cors({
